@@ -1,0 +1,10 @@
+Home Assignment:
+
+1. Import the provided Postman collection.
+2. Practice all **3 requests** available in the collection.
+3. Take screenshots of the successful execution of each request.
+4. Combine the screenshots into a **single PDF**.
+5. Push the PDF to your **GitHub repository**.
+6. Share the **GitHub repository link** in the **Assignment Tracker**.
+
+Please complete the assignment before the next session.
