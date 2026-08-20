@@ -1,0 +1,35 @@
+Integrate the Jira with  this existing codebase
+
+
+Activity: Integrate the AI Agent with Jira by adding a "Connect Jira" feature that allows users to establish a connection using their Jira Base URL, Email ID, and Jira API Token. Once the connection is successfully established, retrieve and populate the available Jira user stories within the application. Ensure the implementation follows the existing project architecture, UI design, and coding standards while maintaining compatibility with the current functionality.
+
+
+Sample prompt for Jira integration:
+
+Front end:
+
+Need to add "Connect Jira" button to establish the connection
+
+Base url
+Email id:
+Jira API key
+
+
+
+Sample prompt for UI:
+
+Read my entire workspace and understand how UI implemented in the frontend folder
+
+I want to add "Connect Jira" button to establish the connection(Base url
+Email id,Jira API key_)
+
+once the jira is connected userstories should be populated in the UI screen.
+
+[STRICTLY] DO THE IMPLEMENTATION ONLY ON UI
+
+
+After Implementing the UI changes, ensure that the "Connect Jira" button is functional and triggers the connection process. Upon successful connection, fetch the user stories from Jira and display them in a structured format within the UI.
+
+
+
+

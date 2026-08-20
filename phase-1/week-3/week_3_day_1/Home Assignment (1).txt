@@ -1,0 +1,7 @@
+Home Assignment:
+
+Implement Playwright with TypeScript
+
+Use Ask Mode to analyze the existing project structure and identify all impacted files required for the Playwright with TypeScript implementation.
+Once the analysis is complete, switch to Agent Mode to implement the required changes
+
