@@ -1,0 +1,13 @@
+*Home Assignment:*
+Build a Document Question Answering (Document QA) Agent
+
+Develop an AI-powered Document QA agent that enables users to upload a document from their local system and ask questions based on its content. The agent should extract the document content, understand the user's query, and provide accurate answers using only the uploaded document as the source of information. If the requested information is not available in the document, the agent should respond appropriately instead of generating unsupported answers.
+
+Expected Outcome: Users should be able to upload a document, ask multiple questions, and receive context-aware answers derived only from the uploaded document.
+
+list of nodes :
+
+1.Manual Trigger
+2.Read /write files from disk
+3.Extract from file
+4.Basic LLM chain
