@@ -1,0 +1,32 @@
+Home Assignment:
+
+ GitHub Code Reviewer Agent with Custom UI
+
+Using the User Story Reviewer workflow and UI files as a reference, build a custom UI for the existing GitHub Code Reviewer Agent.
+
+Update the n8n workflow by adding a Webhook node as the first node and a Respond to Webhook node as the final node. Create your own phase-wise UI development prompt, build the UI, and connect it to the n8n workflow.
+
+Customize the UI based on your organization’s branding, including:
+
+- Organization name and logo
+- Brand theme and colours
+- Professional header and footer
+- Suitable fonts, buttons, icons, and layout
+- Responsive design for desktop, tablet, and mobile
+- Loading, success, validation, and error messages
+- Any other relevant organization-specific enhancements
+
+Submission Requirements
+
+Submit the following items in both the WhatsApp group and your GitHub repository:
+
+- Phase-wise implementation file
+- Complete UI development prompt file
+- n8n GitHub Code Reviewer workflow file
+- Complete UI source-code files
+- Screenshot of the complete n8n workflow
+- Screenshots of the final UI and code-review results
+- GitHub repository link
+- Short demo video, if required
+
+Ensure that the complete application is tested and working correctly before submission.

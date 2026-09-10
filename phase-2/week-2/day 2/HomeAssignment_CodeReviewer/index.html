@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeLens | AI Tester GitHub Code Review</title>
+  <meta name="description" content="AI Tester's GitHub Code Reviewer Agent: submit a GitHub file URL and receive an AI-generated code review." />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css?v=16" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="app-header">
+    <div class="app-header__inner">
+      <div class="app-header__brand">
+        <span class="logo-mark" aria-hidden="true"><i data-lucide="scan-line"></i></span>
+        <div class="app-header__identity">
+          <span class="app-header__product">CodeLens</span>
+          <span class="app-header__tagline">Clearer code. Confident releases.</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="app-main">
+    <p id="status-announcer" class="visually-hidden" role="status" aria-live="polite"></p>
+
+    <section class="review-section" aria-labelledby="review-form-heading">
+      <h2 id="review-form-heading" class="section-heading">Review a GitHub File</h2>
+      <form class="panel review-form" id="review-form" novalidate>
+        <label class="review-form__label" for="github-url">GitHub file URL</label>
+        <input
+          type="text"
+          id="github-url"
+          name="github-url"
+          class="review-form__input"
+          placeholder="https://github.com/owner/repo/blob/main/path/to/File.ext"
+          aria-describedby="github-url-hint github-url-error"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <p class="review-form__hint" id="github-url-hint">
+          Paste a direct link to a file on GitHub, for example:
+          <code>https://github.com/testleaftrainings/Sel_May_2026/blob/main/Week5/Day2/LearnDragAndDrop.java</code>
+        </p>
+        <p class="review-form__error" id="github-url-error" role="alert" hidden></p>
+        <button type="submit" class="button button--primary review-form__submit" id="review-submit-button">
+          Review Code
+        </button>
+      </form>
+    </section>
+
+    <section class="review-section" aria-labelledby="review-results-heading">
+      <h2 id="review-results-heading" class="section-heading" tabindex="-1">AI Review Results</h2>
+      <div class="panel review-workspace" id="review-workspace" data-state="idle">
+        <div class="review-workspace__view" data-state-view="idle">
+          <p class="review-workspace__lead">Here's how it works:</p>
+          <ol class="review-journey">
+            <li>Enter GitHub URL</li>
+            <li>Review Code</li>
+            <li>Review in Progress</li>
+            <li>Review Completed</li>
+          </ol>
+          <p class="review-workspace__hint">Submit a file above to see the review workspace in action.</p>
+        </div>
+
+        <div class="review-workspace__view" data-state-view="loading" hidden>
+          <p class="review-workspace__status">Review in Progress</p>
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="review-workspace__hint">Please wait while the review is processed.</p>
+        </div>
+
+        <div class="review-workspace__view" data-state-view="ready" hidden>
+          <p class="review-workspace__status review-workspace__status--success">Review Completed</p>
+          <p class="review-workspace__hint">
+            Reviewed URL: <span id="review-workspace__submitted-url" class="review-workspace__submitted-url"></span>
+          </p>
+          <!-- Raw review text/Markdown from n8n; Phase 6 adds safe Markdown formatting. -->
+          <div class="review-result" id="review-result-content"></div>
+          <div class="review-workspace__actions">
+            <button type="button" class="button button--secondary" id="copy-review-button">
+              <i data-lucide="copy" aria-hidden="true"></i>
+              Copy Review
+            </button>
+            <button type="button" class="button button--secondary" id="show-email-button">
+              <i data-lucide="mail" aria-hidden="true"></i>
+              Send Email
+            </button>
+            <button type="button" class="button button--secondary js-review-again">
+              <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+              Review Another File
+            </button>
+          </div>
+          <form class="email-form" id="email-form" hidden novalidate>
+            <label class="email-form__label" for="recipient-email">Recipient email</label>
+            <div class="email-form__controls">
+              <input
+                type="email"
+                id="recipient-email"
+                class="email-form__input"
+                placeholder="person-or-team@example.com"
+                autocomplete="email"
+                aria-describedby="recipient-email-error"
+              />
+              <button type="submit" class="button button--primary email-form__submit" id="send-email-button" aria-label="Send review by email" disabled>
+                <i data-lucide="arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="email-form__error" id="recipient-email-error" role="alert" hidden></p>
+            <p class="email-form__status" id="email-form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="review-workspace__view" data-state-view="error" hidden>
+          <p class="review-workspace__status review-workspace__status--error">Review Failed</p>
+          <p class="review-workspace__hint" id="review-error-message">
+            The review could not be completed. Retry, or review another file.
+          </p>
+          <div class="review-workspace__actions">
+            <button type="button" class="button button--secondary" id="review-retry-button">Retry</button>
+            <button type="button" class="button button--secondary js-review-again">Review Another File</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/markdown.js?v=13"></script>
+  <script src="js/app.js?v=14"></script>
+</body>
+</html>

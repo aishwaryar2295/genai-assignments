@@ -1,0 +1,281 @@
+{
+  "name": "week2_day2_assignmnet",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://raw.githubusercontent.com/testleaftrainings/Sel_May_2026/main/Week5/Day2/LearnDragAndDrop.java",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "178f3abb-7fd3-4b54-af4e-9c267b7e2a71",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=For this given Input java code :{{ $json.data }} follow these;\n\nInstuctions:\n\nYou are an expert Software Code Reviewer specialized in Java enterprise development and test automation frameworks.\nYour task is to analyze and review the uploaded Java code based on specific quality parameters and provide:\n\nIndividual parameter scores (each out of 20)\n\nOverall code quality score (out of 100)\n\nActionable feedback and recommendations for improvement\n\nEvaluate the Java code against the following five parameters:\n\nCode Readability: Are naming conventions, indentation, and structure clear and consistent?\n\nCode Efficiency: Does the code avoid unnecessary loops, redundant logic, and optimize performance?\n\nError Handling: Does the code handle exceptions gracefully with meaningful messages and proper use of try-catch/finally or logging?\n\nMaintainability: Is the code modular, reusable, and easily extendable for future changes?\n\nBest Practices & Standards: Does the code follow Java best practices (SOLID, DRY, proper imports, dependency management, etc.)?\n\nFinally, generate an overall rating with improvement areas and a short summary.\n\nC – Context\n\nThe input Java code belongs to a production-grade software project (could be backend automation, web app, or API service).\nAssume that this code will be part of a shared repository reviewed by multiple developers, so it must comply with clean code, maintainability, and security standards.\nYou are reviewing this code as part of a formal pull request (PR) process.\n\n\nExample Output (Review Summary):\n\nParameter\tDescription\tScore (out of 20)\nCode Readability\tNaming is clear but lacks comments or documentation.\t16\nCode Efficiency\tSimple arithmetic; no inefficiencies observed.\t18\nError Handling\tMissing division-by-zero handling.\t10\nMaintainability\tClass is minimal; not modularized for future extensions.\t14\nBest Practices & Standards\tLacks input validation and unit tests.\t13\n\nOverall Score: 71 / 100\n\nImprovement Areas:\n\nAdd input validation for division-by-zero errors.\n\nInclude JavaDoc comments for public methods.\n\nImplement basic unit tests to validate functionality.\n\nSummary:\nThe code functions correctly but lacks robustness and documentation. Minor improvements can enhance production readiness.\n\nP – Persona\n\nYou are a senior Java architect and code reviewer with 10+ years of experience in enterprise application design, CI/CD integration, and automation frameworks (Spring Boot, Selenium, Playwright, TestNG).\nYou are known for balancing code quality with real-world performance and maintainability.",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        32,
+        16
+      ],
+      "id": "314c4b73-47d5-48e6-b75e-fbc1639579a0",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        224
+      ],
+      "id": "1cbf4dc0-faf7-49a0-a47f-0c12ff4a2141",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "TTptJDAFk2lIFzrf",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "Github_code_reviewer",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        16
+      ],
+      "id": "81aa0061-e125-4b17-b92a-d625c6e5a3af",
+      "name": "Webhook",
+      "webhookId": "8c08dcac-ebfa-4552-8b53-5e2b7b5530a4"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        400,
+        16
+      ],
+      "id": "3e6e13f0-6fbb-4821-9ebb-e1d5698c109f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "\tGithub_code_reviewer_email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        464
+      ],
+      "id": "638cb60d-3586-415e-b641-8ec173086681",
+      "name": "Webhook1",
+      "webhookId": "8c08dcac-ebfa-4552-8b53-5e2b7b5530a4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $json.body ?? $json;\n\nconst email = String(request.email ?? \"\").trim();\nconst reviewText = String(request.reviewText ?? \"\").trim();\nconst reviewedUrl = String(request.reviewedUrl ?? \"\").trim();\nconst fileName = String(request.fileName ?? \"code-review\").trim();\n\nif (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {\n  throw new Error(\"A valid recipient email address is required.\");\n}\n\nif (!reviewText) {\n  throw new Error(\"Review content is required.\");\n}\n\nif (!reviewedUrl) {\n  throw new Error(\"Reviewed GitHub URL is required.\");\n}\n\nreturn [\n  {\n    json: {\n      email,\n      reviewText,\n      reviewedUrl,\n      fileName,\n      generatedAt: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        464
+      ],
+      "id": "cd158d76-de28-4369-b4f5-56478a6b4426",
+      "name": "Validate Email Request"
+    },
+    {
+      "parameters": {
+        "fromEmail": "=aishwarya.r2295@gmail.com",
+        "toEmail": "={{$json.email}}",
+        "subject": "=AI Code Review - {{$json.fileName}}",
+        "html": "={{$json.htmlBody}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        464
+      ],
+      "id": "c3cafe20-6142-42e8-80e9-e6943789db2b",
+      "name": "Send an Email",
+      "webhookId": "f868d694-c2f9-4a69-b272-aab051294b70",
+      "credentials": {
+        "smtp": {
+          "id": "dsMLAXsoV5VkNuI1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Review sent successfully by email.\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        496,
+        464
+      ],
+      "id": "16824e29-4315-4c3a-8e1f-83e2db40b20a",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const {\n  email,\n  reviewText,\n  reviewedUrl,\n  fileName,\n  generatedAt\n} = $json;\n\nfunction escapeHtml(value) {\n  return String(value)\n    .replace(/&/g, \"&amp;\")\n    .replace(/</g, \"&lt;\")\n    .replace(/>/g, \"&gt;\")\n    .replace(/\"/g, \"&quot;\")\n    .replace(/'/g, \"&#39;\");\n}\n\nconst htmlBody = `\n<!doctype html>\n<html>\n<body style=\"font-family: Arial, sans-serif; color: #1f2328; line-height: 1.5;\">\n  <h2 style=\"color: #0969da;\">AI Tester CodeLens</h2>\n\n  <p><strong>GitHub Code Review</strong></p>\n\n  <p>\n    <strong>File:</strong> ${escapeHtml(fileName)}<br>\n    <strong>Reviewed URL:</strong>\n    <a href=\"${escapeHtml(reviewedUrl)}\">${escapeHtml(reviewedUrl)}</a><br>\n    <strong>Generated:</strong> ${escapeHtml(generatedAt)}\n  </p>\n\n  <hr>\n\n  <div style=\"white-space: pre-wrap; font-family: Arial, sans-serif;\">\n    ${escapeHtml(reviewText)}\n  </div>\n</body>\n</html>\n`;\n\nconst textBody = `\nAI Tester CodeLens\nGitHub Code Review\n\nFile: ${fileName}\nReviewed URL: ${reviewedUrl}\nGenerated: ${generatedAt}\n\n----------------------------------------\n\n${reviewText}\n`;\n\nreturn [\n  {\n    json: {\n      email,\n      fileName,\n      reviewedUrl,\n      generatedAt,\n      htmlBody,\n      textBody\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        464
+      ],
+      "id": "6882341a-2d87-4f75-bbb6-50698acd823f",
+      "name": "Prepare Email Content"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Validate Email Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Email Request": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Content": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c7beb3f0-7579-4409-b821-84bd336fb48c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0c6781166bd95b23e6cbc30f34a33ce0d4da726aae111c004e16f0d273ffe422"
+  },
+  "nodeGroups": [],
+  "id": "edSdkdGdu8PUfHgX",
+  "tags": []
+}
